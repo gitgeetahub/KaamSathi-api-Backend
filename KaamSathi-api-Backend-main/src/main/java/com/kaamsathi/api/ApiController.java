@@ -51,6 +51,11 @@ public class ApiController {
         this.adminSetupKey = adminSetupKey;
     }
 
+    @GetMapping("/")
+    public Map<String, Object> root() {
+        return Map.of("ok", true, "message", "KaamSathi backend is running. Use /api/health, /api/auth/login, etc.");
+    }
+
     @GetMapping("/health")
     public Map<String, Object> health() {
         teams.count();
