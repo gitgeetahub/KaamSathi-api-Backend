@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "${kaamsathi.cors-origin}")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}, allowCredentials = "true")
 @Transactional
 public class ApiController {
     private static final List<String> ATTENDANCE_STATUSES = List.of("Present", "Absent", "Late", "Half-day");

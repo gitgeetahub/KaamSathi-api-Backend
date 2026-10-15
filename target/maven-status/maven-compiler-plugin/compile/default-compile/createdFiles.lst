@@ -1,0 +1,16 @@
+com\kaamsathi\KaamSathiApplication.class
+com\kaamsathi\model\Account.class
+com\kaamsathi\repository\WorkerTransactionRepository.class
+com\kaamsathi\model\Attendance.class
+com\kaamsathi\repository\AccountRepository.class
+com\kaamsathi\model\Team.class
+com\kaamsathi\api\RootController.class
+com\kaamsathi\repository\TeamRepository.class
+com\kaamsathi\service\TokenService.class
+com\kaamsathi\api\ApiController.class
+com\kaamsathi\repository\AttendanceRepository.class
+com\kaamsathi\model\Worker.class
+com\kaamsathi\api\ApiExceptionHandler.class
+com\kaamsathi\model\WorkerTransaction.class
+com\kaamsathi\repository\WorkerRepository.class
+com\kaamsathi\service\LegacySchemaMigration.class
