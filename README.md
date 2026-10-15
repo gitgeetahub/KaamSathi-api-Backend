@@ -26,10 +26,10 @@ Start the API from the project root:
 mvn -f backend\pom.xml spring-boot:run
 ```
 
-The API listens on `http://localhost:5000`; Vite proxies `/api` requests to it. On first setup, create the initial admin account once:
+For local development, the API listens on `http://localhost:5000` and Vite proxies `/api` requests to it. To create the initial admin account on the deployed API, run this once:
 
 ```powershell
-Invoke-RestMethod -Method Post -Uri http://localhost:5000/api/auth/setup-admin `
+Invoke-RestMethod -Method Post -Uri https://kaamsathi-api-backend.onrender.com/api/auth/setup-admin `
   -Headers @{ "x-admin-setup-key" = $env:ADMIN_SETUP_KEY } `
   -ContentType "application/json" `
   -Body '{"username":"admin","password":"change-this-password"}'
@@ -45,6 +45,6 @@ The repository includes a Render Blueprint (`../render.yaml`) for the static Rea
 jdbc:mysql://your-mysql-host:3306/kaamsathi?useSSL=true&serverTimezone=UTC
 ```
 
-Render generates `JWT_SECRET` and `ADMIN_SETUP_KEY`. The blueprint configures the API CORS origin and frontend API URL for the service names in `render.yaml`; update those URLs if you change the service names or use a custom domain. After both services are healthy, create the first admin account by sending a one-time `POST` request to `https://kaamsathi-api.onrender.com/api/auth/setup-admin`, with the `x-admin-setup-key` header set to the value of the API's `ADMIN_SETUP_KEY` environment variable and a JSON body containing `username` and a strong `password`. Never put database credentials or setup keys in source control.
+Render generates `JWT_SECRET` and `ADMIN_SETUP_KEY`. The blueprint configures the API CORS origin and frontend API URL for the service names in `render.yaml`; update those URLs if you change the service names or use a custom domain. After both services are healthy, create the first admin account by sending a one-time `POST` request to `https://kaamsathi-api-backend.onrender.com/api/auth/setup-admin`, with the `x-admin-setup-key` header set to the value of the API's `ADMIN_SETUP_KEY` environment variable and a JSON body containing `username` and a strong `password`. Never put database credentials or setup keys in source control.
 
 The current local MySQL records are not automatically copied to the Render database. Export/import the records separately if the hosted app must start with the existing workers and attendance.

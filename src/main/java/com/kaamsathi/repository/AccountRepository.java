@@ -10,4 +10,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findFirstByPhoneAndRoleAndActiveTrue(String phone, String role);
     List<Account> findByActiveTrueOrderByIdAsc();
     boolean existsByWorkerIdAndIdNot(Long workerId, Long accountId);
+    boolean existsByUsername(String username);
+    boolean existsByPhone(String phone);
 }
