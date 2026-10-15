@@ -84,6 +84,89 @@ public class ApiController {
                 "account", Map.of("id", account.id, "username", account.username, "role", account.role)));
     }
 
+    @PostMapping("/auth/register")
+    public ResponseEntity<?> register(@RequestBody Map<String, Object> body) {
+        String role = text(body.getOrDefault("role", "admin")).toLowerCase().trim();
+        String preferredLanguage = language(body.get("preferred_language"));
+
+        if ("admin".equals(role)) {
+            String username = text(body.get("username")).trim();
+            String password = text(body.get("password"));
+            if (username.length() < 3 || password.length() < 6) {
+                return failure(HttpStatus.BAD_REQUEST, "Username must be at least 3 characters and password at least 6 characters.");
+            }
+            if (accounts.existsByUsername(username)) {
+                return failure(HttpStatus.CONFLICT, "An account with this username already exists.");
+            }
+            Account account = new Account();
+            account.username = username;
+            account.passwordHash = passwordEncoder.encode(password);
+            account.role = "admin";
+            account.preferredLanguage = preferredLanguage;
+            account.active = true;
+            accounts.save(account);
+
+            Map<String, Object> profile = new LinkedHashMap<>();
+            profile.put("id", account.id);
+            profile.put("username", account.username);
+            profile.put("role", account.role);
+            profile.put("preferred_language", account.preferredLanguage);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "success", true,
+                    "message", "Admin account created successfully.",
+                    "token", tokens.create(account),
+                    "profile", profile
+            ));
+        } else if ("worker".equals(role) || "gutha_leader".equals(role)) {
+            String fullName = text(body.getOrDefault("full_name", body.get("name"))).trim();
+            String phone = text(body.get("phone")).trim();
+            String pin = text(body.get("pin")).trim();
+
+            if (phone.isBlank() || !pin.matches("\\d{4,8}")) {
+                return failure(HttpStatus.BAD_REQUEST, "Please provide a valid phone number and a 4–8 digit PIN.");
+            }
+            if (accounts.existsByPhone(phone)) {
+                return failure(HttpStatus.CONFLICT, "An account with this phone number already exists.");
+            }
+
+            BigDecimal dailyWage = decimal(body.get("daily_wage"));
+            if (dailyWage == null || dailyWage.compareTo(BigDecimal.ZERO) <= 0) {
+                dailyWage = BigDecimal.valueOf(500);
+            }
+
+            Worker worker = new Worker(fullName.isBlank() ? "Worker " + phone : fullName, role, null, dailyWage);
+            worker.legacyPhone = phone;
+            worker.joinedDate = LocalDate.now();
+            worker = workers.save(worker);
+
+            Account account = new Account();
+            account.phone = phone;
+            account.pinHash = passwordEncoder.encode(pin);
+            account.role = role;
+            account.worker = worker;
+            account.preferredLanguage = preferredLanguage;
+            account.active = true;
+            accounts.save(account);
+
+            Map<String, Object> profile = new LinkedHashMap<>();
+            profile.put("id", account.id);
+            profile.put("phone", account.phone);
+            profile.put("role", account.role);
+            profile.put("worker_id", worker.getId());
+            profile.put("preferred_language", account.preferredLanguage);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "success", true,
+                    "message", "Account registered successfully.",
+                    "token", tokens.create(account),
+                    "profile", profile
+            ));
+        } else {
+            return failure(HttpStatus.BAD_REQUEST, "Invalid role. Must be admin, worker, or gutha_leader.");
+        }
+    }
+
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String, Object> body) {
         String mode = text(body.getOrDefault("mode", "admin"));
